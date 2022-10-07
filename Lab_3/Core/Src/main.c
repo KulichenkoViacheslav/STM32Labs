@@ -106,25 +106,32 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-   button_current_state = HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin);
+    button_current_state = HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin);
     if (button_current_state == GPIO_PIN_SET && button_previous_state == GPIO_PIN_RESET)
     {
     over_time ++;
-     if(over_time == 10)
-        over_time = 1;
-   }
+    if(over_time > 10)
+    {   
+		over_time = 1;
+		}
+		}
+		button_previous_state = button_current_state;
      
-  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
-   HAL_Delay(over_time * 10);
-  HAL_GPIO_TogglePin(LED_ORANGE_GPIO_Port, LED_ORANGE_Pin);
-   HAL_Delay(over_time * 10);
-  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-   HAL_Delay(over_time * 10);
-  HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-   HAL_Delay(over_time * 10);
-  HAL_Delay(over_time * 100);    
-  button_previous_state = button_current_state;
-   over_time++;
+		HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+		HAL_Delay(over_time * 100); 
+		HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+		
+		HAL_GPIO_TogglePin(LED_ORANGE_GPIO_Port, LED_ORANGE_Pin);
+		HAL_Delay(over_time * 100); 
+		HAL_GPIO_TogglePin(LED_ORANGE_GPIO_Port, LED_ORANGE_Pin);
+		
+		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		HAL_Delay(over_time * 100); 
+		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		
+		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		HAL_Delay(over_time * 100); 
+		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
   
       
     
