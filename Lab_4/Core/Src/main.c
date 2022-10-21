@@ -36,10 +36,16 @@
 	#define T0 0
 	#define T1 125
 	#define T2 500
-	#define T3 624
+	#define T3 625
+	
 	#define Shift_Second 125
 	#define Shift_Third 250
 	#define Shift_Fourth 375
+	
+	#define Cycle_Length 1000
+	#define Max_PWM 1000
+	#define Min_PWM 0	
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,11 +56,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-	uint16_t Steps_First[1000] = {};
-	uint16_t Steps_Second[1000];
-	uint16_t Steps_Third[1000];
-	uint16_t Steps_Fourth[1000];
+	uint16_t steps_first[1000] = {0};
+	uint16_t Steps_Second[1000] = {0};
+	uint16_t Steps_Third[1000] = {0};
+	uint16_t Steps_Fourth[1000] = {0};
+		
 	uint16_t index = 0;
+	uint16_t coefficient = 0;
+	
 	GPIO_PinState button_state = GPIO_PIN_RESET;
 /* USER CODE END PV */
 
@@ -105,32 +114,42 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
 	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
 	
-	for(int i = T0; i < 1000; i++)
-		{
-			if (i == T0 || i >= T3) Steps_First[i] = 0;
-			
-			else if(i < T1)
-				{
-					Steps_First[i] = Steps_First[i - 1] + 8;
-					Steps_First[T3 - i] = Steps_First[i];
+	coefficient = (Max_PWM - Min_PWM)/(T1 - T0);
+	for(int i = T0; i < Cycle_Length; i++)
+		{					
+			if(i < T1)
+				{					
+					steps_first[i] = i * coefficient;					
 				} 
-				else if (i < T2 && i >= T1)
-					Steps_First[i] = Steps_First[T1 - 1];	
+				else if (i < T2)
+					{
+					steps_first[i] = Max_PWM;	
+					}
+					
+				else if(i < T3)
+					{
+						steps_first[i] = Max_PWM - (i - T2) * (coefficient);
+					}
+					
+				else
+					{
+						steps_first[i] = Min_PWM;
+					}
 		}
 		
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < Cycle_Length; i++)
 		{
 			int j = i + Shift_Second;
-			if (j >= 1000) j = j - 1000;
-			Steps_Second[j] = Steps_First[i];
+			if (j >= Cycle_Length) j = j - 1000;
+			Steps_Second[j] = steps_first[i];
 			
 			j = i + Shift_Third;
-			if (j >= 1000) j = j - 1000;
-			Steps_Third[j] = Steps_First[i];
+			if (j >= Cycle_Length) j = j - 1000;
+			Steps_Third[j] = steps_first[i];
 			
 			j = i + Shift_Fourth;
-			if (j >= 1000) j = j - 1000;
-			Steps_Fourth[j] = Steps_First[i];			
+			if (j >= Cycle_Length) j = j - 1000;
+			Steps_Fourth[j] = steps_first[i];			
 		}
 
 	
@@ -192,25 +211,26 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	button_state = HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin);
-	if (button_state == GPIO_PIN_SET)
+	button_state = HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin); //Check if button is pressed
+	if (button_state == GPIO_PIN_SET) 
 	{
 		
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, Steps_Third[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, Steps_Second[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, Steps_First[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, Steps_Fourth[index]);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, Steps_Third[index]);  //Green - 3
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, Steps_Second[index]); //Orange - 2
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, steps_first[index]);  //Red - 1
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, Steps_Fourth[index]); //Blue - 4
 		
 	}
 	else
 	{
 		
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, Steps_Second[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, Steps_Third[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, Steps_Fourth[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, Steps_First[index]);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, Steps_Second[index]); //Green - 2
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, Steps_Third[index]);  //Orange - 3
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, Steps_Fourth[index]); //Red - 4
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, steps_first[index]);  //Blue - 1
 		
-	}
+	}	
+	
 	index ++;
 	if (index == 1000) index = 0;
 }
