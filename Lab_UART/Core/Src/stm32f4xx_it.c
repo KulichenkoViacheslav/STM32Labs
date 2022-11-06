@@ -58,9 +58,7 @@
 extern TIM_HandleTypeDef htim4;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-//uint32_t * p_mass;
-//uint32_t mass_syze = 0;
-//uint32_t mass_index = 0;
+
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -72,7 +70,7 @@ extern UART_HandleTypeDef huart2;
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
-
+  
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
   while (1)
@@ -87,7 +85,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-
+  
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
@@ -102,7 +100,7 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
-
+  
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -117,7 +115,7 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
-
+  
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -132,7 +130,7 @@ void BusFault_Handler(void)
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
-
+  
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {
@@ -207,15 +205,7 @@ void SysTick_Handler(void)
 void TIM4_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM4_IRQn 0 */
-//  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_1, p_mass[mass_index]);
-//  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_2, p_mass[mass_index]);
-//  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_3, p_mass[mass_index]);
-//  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_4, p_mass[mass_index]);
-//  mass_index ++;
-//  if (mass_index >= mass_syze)
-//  {
-//    mass_index = 0;
-//  }
+
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
@@ -238,9 +228,5 @@ void USART2_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
-//void transfer_mass(uint32_t * p_massiv, uint32_t size_massiv)
-//{
-//  p_mass = p_massiv;
-//  mass_syze = size_massiv;
-//}
+
 /* USER CODE END 1 */

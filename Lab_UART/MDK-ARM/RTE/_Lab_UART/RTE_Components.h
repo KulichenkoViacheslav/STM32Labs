@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'LAB_TIM_IT' 
- * Target:  'LAB_TIM_IT' 
+ * Project: 'Lab_UART' 
+ * Target:  'Lab_UART' 
  */
 
 #ifndef RTE_COMPONENTS_H

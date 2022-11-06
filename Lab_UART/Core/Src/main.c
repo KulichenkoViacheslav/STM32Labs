@@ -22,8 +22,12 @@
 #include "usart.h"
 #include "gpio.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
+#include "led.h"
+#include "command_line.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,14 +37,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MASS_SIZE 1000
-#define T0 0
-#define T1 125
-#define T2 500
-#define T3 624
-#define Shift_Orange 125
-#define Shift_Green 250
-#define Shift_Blue 375
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,19 +47,19 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t Steps_Red[1000];
-uint16_t Steps_Orange[1000];
-uint16_t Steps_Green[1000];
-uint16_t Steps_Blue[1000];
-uint16_t index = 0;
-uint16_t temp = 0;
-GPIO_PinState button_state = GPIO_PIN_RESET;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+uint8_t msg[] = "Hello world\r\n";
+uint8_t mass_input_data[100] = {0};
+uint8_t mass_index = 0;
+uint8_t buffer = 0;
+uint32_t number = 0;
+uint8_t color[10] = {0};
+uint8_t color_index = 0;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -98,50 +94,40 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_TIM4_Init();
   MX_USART2_UART_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-HAL_TIM_Base_Start_IT(&htim4);
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-	
-	for(int i = T0; i < 1000; i++)
-		{
-			if (i == T0 || i >= T2) Steps_Red[i] = 0;
-			
-			else if(i < T1)
-				{
-					Steps_Red[i] = Steps_Red[i - 1] + 8;
-					Steps_Red[T2 - i] = Steps_Red[i];
-				} 
-				else if (i < T2 && i >= T1)
-					Steps_Red[i] = Steps_Red[T1 - 1];	
-		}
-		
-	for (int i = 0; i < 1000; i++)
-		{
-			int j = i + Shift_Orange;
-			if (j >= 1000) j = j - 1000;
-			Steps_Orange[j] = Steps_Red[i];
-			
-			j = i + Shift_Green;
-			if (j >= 1000) j = j - 1000;
-			Steps_Green[j] = Steps_Red[i];
-			
-			j = i + Shift_Blue;
-			if (j >= 1000) j = j - 1000;
-			Steps_Blue[j] = Steps_Red[i];			
-		}
-
-//  transfer_mass(&mass[0], MASS_SIZE);
+  led_init();
+  command_line_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+/*    printf(">> Please enter number 0-99...\r");
+    HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, &mass_input_data[0], 2, 3000);
+    if (status == HAL_OK)
+    {
+      printf("\r\n>>Counter = ");
+      for (uint8_t i = 0; i < 10; i ++)
+      {
+        if (mass_input_data[i] != 0)
+        printf("%i", mass_input_data[i] - 0x30);
+      }
+      printf("\r\n");
+    }
+    else if (status == HAL_TIMEOUT)
+    {
+      printf("\r\n>>Uart timeout\r\n");
+    }
+    else
+    {
+      printf("\r\n>>Uart error\r\n");
+    }
+*/    
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -181,8 +167,8 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
@@ -191,29 +177,9 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  button_state = HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin);
-	if (button_state == GPIO_PIN_SET)
-  {
-  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_1, Steps_Red[index]);
-  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_2, Steps_Orange[index]);
-  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_3, Steps_Green[index]);
-  __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_4, Steps_Blue[index]);
-  }
-  else
-  {
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1,Steps_Blue[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, Steps_Green[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, Steps_Orange[index]);
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, Steps_Red[index]);
-    
- }
-  index ++;
-  if (index == 625 )
-		index = 0;
- }
-  
+// Green:100
+
+
 /* USER CODE END 4 */
 
 /**
@@ -224,6 +190,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  
   __disable_irq();
   while (1)
   {

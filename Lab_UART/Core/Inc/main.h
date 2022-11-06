@@ -53,22 +53,10 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-//void transfer_mass(uint32_t * p_massiv, uint32_t size_massiv);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define Button_Pin GPIO_PIN_0
-#define Button_GPIO_Port GPIOA
-#define MY_HAND_Pin GPIO_PIN_1
-#define MY_HAND_GPIO_Port GPIOA
-#define led_Green_Pin GPIO_PIN_12
-#define led_Green_GPIO_Port GPIOD
-#define led_Orange_Pin GPIO_PIN_13
-#define led_Orange_GPIO_Port GPIOD
-#define led_Red_Pin GPIO_PIN_14
-#define led_Red_GPIO_Port GPIOD
-#define led_Blue_Pin GPIO_PIN_15
-#define led_Blue_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
