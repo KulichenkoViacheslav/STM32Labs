@@ -105,29 +105,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-/*    printf(">> Please enter number 0-99...\r");
-    HAL_StatusTypeDef status = HAL_UART_Receive(&huart2, &mass_input_data[0], 2, 3000);
-    if (status == HAL_OK)
-    {
-      printf("\r\n>>Counter = ");
-      for (uint8_t i = 0; i < 10; i ++)
-      {
-        if (mass_input_data[i] != 0)
-        printf("%i", mass_input_data[i] - 0x30);
-      }
-      printf("\r\n");
-    }
-    else if (status == HAL_TIMEOUT)
-    {
-      printf("\r\n>>Uart timeout\r\n");
-    }
-    else
-    {
-      printf("\r\n>>Uart error\r\n");
-    }
-*/    
-    HAL_Delay(1000);
+		if(led_get_state() == completed_config)
+		{
+			command_line_init();
+			led_set_state(wait_new_config);
+		}
+		
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

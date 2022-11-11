@@ -58,12 +58,23 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         break;
       }
     }
-    printf("\r\n>> Set color %s = %i %%\r\n", color, number);
-    led_config_s_t new_config;
-	  memcpy(new_config.color, color, sizeof(color));		
-		new_config.power = number;
-		led_set_power(new_config);
-		
+		if(((strcmp((char*)color, "green") == 0) || 
+				(strcmp((char*)color, "red") == 0) ||
+				(strcmp((char*)color, "blue") == 0) ||
+				(strcmp((char*)color, "orange") == 0)) && 
+				((number <= 100) && (number >= 0)))
+		{
+			printf("\r\n>> Set color %s = %i %%\r\n", color, number);
+			led_config_s_t new_config;
+			memcpy(new_config.color, color, sizeof(color));		
+			new_config.power = number;
+			led_set_power(new_config);
+		}
+		else
+		{
+			printf("\n\rtry again bidlo\n\r");
+			led_set_state(completed_config);
+		}
 		//clear input buffer
 		for (uint8_t i = 0; i < sizeof(mass_input_data); i ++)
     {
