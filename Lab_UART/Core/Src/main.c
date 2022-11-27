@@ -128,7 +128,9 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t counter = 0;
-  printf("**************\r\n");
+  HAL_UART_Transmit(&huart2, msg, sizeof(msg), 1000);
+  counter = sprintf((char *)msg, "* - %d\r\n", counter);
+  HAL_UART_Transmit(&huart2, msg, counter, 1000);
   printf(">> Please enter number 0-99...");
   HAL_UART_Receive_IT(&huart2, &buffer, 1);
   while (1)
